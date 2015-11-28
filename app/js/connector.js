@@ -15,6 +15,8 @@ function createConnector(fromNode, toNode) {
     );
     var line = new THREE.Line(geometry, material);
 
+    line.userData.filled = false;
+
     line.userData.fill = function(fromNode, toNode) {
         var startPos = fromNode.position.clone();
         var endPos = toNode.position.clone();
@@ -29,6 +31,7 @@ function createConnector(fromNode, toNode) {
             filler.geometry.verticesNeedUpdate = true;
         } else {
             filler.geometry.verticesNeedUpdate = false;
+            line.userData.filled = true;
         }
     }
 

@@ -52,6 +52,12 @@ function createNode(posX, posY, posZ) {
         if (cube.userData.filled) {
             _.each(cube.userData.connectedNodes, function(connectedNode) {
                 cube.userData.fillTo(connectedNode);
+            });
+        } else {
+            _.each(cube.userData.connectedNodes, function(connectedNode) {
+                if (connectedNode.userData.connectors[connectedNode.id + 'to' + cube.id].userData.filled) {
+                    cube.userData.fill();
+                }
             })
         }
     }

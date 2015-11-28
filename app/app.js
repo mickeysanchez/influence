@@ -76,6 +76,12 @@
             if (cube.userData.filled) {
                 _.each(cube.userData.connectedNodes, function(connectedNode) {
                     cube.userData.fillTo(connectedNode);
+                });
+            } else {
+                _.each(cube.userData.connectedNodes, function(connectedNode) {
+                    if (connectedNode.userData.connectors[connectedNode.id + 'to' + cube.id].userData.filled) {
+                        cube.userData.fill();
+                    }
                 })
             }
         }
@@ -150,6 +156,8 @@
         );
         var line = new THREE.Line(geometry, material);
 
+        line.userData.filled = false;
+
         line.userData.fill = function(fromNode, toNode) {
             var startPos = fromNode.position.clone();
             var endPos = toNode.position.clone();
@@ -164,6 +172,7 @@
                 filler.geometry.verticesNeedUpdate = true;
             } else {
                 filler.geometry.verticesNeedUpdate = false;
+                line.userData.filled = true;
             }
         }
 
