@@ -265,10 +265,7 @@ angular.module('influence', [])
                     }), chance.floating({
                         min: -1000,
                         max: 1000
-                    }), chance.floating({
-                        min: -1000,
-                        max: 1000
-                    }))
+                    }), 0)
                 nodes.push(node);
                 _.each(chance.pick(nodes, chance.integer({
                     min: 2,
@@ -303,7 +300,7 @@ angular.module('influence', [])
 
             camera = new THREE.PerspectiveCamera(
                 75, window.innerWidth / window.innerHeight, 1, 10000);
-            camera.position.z = 3000;
+            camera.position.z = 2000;
 
             generateWeb();
 

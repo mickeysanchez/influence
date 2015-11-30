@@ -18,7 +18,7 @@ angular.module('influence', [])
 
             camera = new THREE.PerspectiveCamera(
                 75, window.innerWidth / window.innerHeight, 1, 10000);
-            camera.position.z = 3000;
+            camera.position.z = 2000;
 
             generateWeb();
 
@@ -30,8 +30,6 @@ angular.module('influence', [])
             renderer.setClearColor(0xfff1d0, 1);
 
             controls = new THREE.OrbitControls(camera);
-            console.log(controls)
-
 
             document.body.appendChild(renderer.domElement);
             renderer.domElement.addEventListener('mousemove', onMouseMove, false);

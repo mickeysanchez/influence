@@ -10,10 +10,7 @@ function generateWeb() {
             }), chance.floating({
                 min: -1000,
                 max: 1000
-            }), chance.floating({
-                min: -1000,
-                max: 1000
-            }))
+            }), 0)
         nodes.push(node);
         _.each(chance.pick(nodes, chance.integer({
             min: 2,
