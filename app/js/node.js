@@ -1,3 +1,4 @@
+NODE_FILL_SPEED = 0.05;
 var nodes = [];
 
 function createNode(posX, posY, posZ) {
@@ -7,19 +8,22 @@ function createNode(posX, posY, posZ) {
         cubeDepth = 10;
     var cubeGeometry = new THREE.CubeGeometry(cubeWidth, cubeHeight, cubeDepth);
     var material = new THREE.MeshBasicMaterial({
-        color: 0xF0C808,
+        color: 0xF0C808
     });
     var cube = new THREE.Mesh(cubeGeometry, material);
     cube.position.set(posX, posY, posZ);
     cube.userData.type = 'main';
 
     cube.userData.filled = false;
-    cube.userData.fill = function() {
+    cube.userData.fill = function(colorHex) {
+        cube.userData.filler.material.color.setHex(
+            colorHex
+        )
         if (cube.userData.filler.scale.y <= cube.scale.y + .01) {
             cube.userData.filler.visible = true;
-            cube.userData.filler.scale.y += .01;
+            cube.userData.filler.scale.y += NODE_FILL_SPEED;
             // Fill from bottom:
-            cube.userData.filler.position.y += (.01 * cubeHeight / 2);
+            cube.userData.filler.position.y += (NODE_FILL_SPEED * cubeHeight / 2);
         } else {
             cube.userData.filled = true;
         }
@@ -35,6 +39,7 @@ function createNode(posX, posY, posZ) {
 
     cube.userData.connectors = {};
     cube.userData.connectedNodes = [];
+
     cube.userData.connectTo = function(mesh) {
         var connector = createConnector(cube, mesh);
         cube.userData.connectors[cube.id + 'to' + mesh.id] = connector;
@@ -55,8 +60,10 @@ function createNode(posX, posY, posZ) {
             });
         } else {
             _.each(cube.userData.connectedNodes, function(connectedNode) {
-                if (connectedNode.userData.connectors[connectedNode.id + 'to' + cube.id].userData.filled) {
-                    cube.userData.fill();
+                var connector = connectedNode.userData.connectors[
+                    connectedNode.id + 'to' + cube.id];
+                if (connector.userData.filled) {
+                    cube.userData.fill(connector.userData.filledColor);
                 }
             })
         }
@@ -79,7 +86,8 @@ function createNode(posX, posY, posZ) {
     outlineMesh.userData.parent = cube;
     cube.userData.outline = outlineMesh;
     outlineMesh.userData.fill = function() {
-        outlineMesh.userData.parent.userData.fill();
+        outlineMesh.userData.parent.userData.fill(
+            outlineMesh.userData.parent.userData.filler.material.color.getHex());
     }
     outlineMesh.userData.highlight = function() {
         outlineMesh.visible = true;
@@ -103,7 +111,8 @@ function createNode(posX, posY, posZ) {
     fillMesh.userData.parent = cube;
     cube.userData.filler = fillMesh;
     fillMesh.userData.fill = function() {
-        fillMesh.userData.parent.userData.fill();
+        fillMesh.userData.parent.userData.fill(
+            fillMesh.userData.parent.userData.filler.material.color.getHex());
     }
     fillMesh.userData.highlight = function() {
         fillMesh.userData.parent.userData.outline.visible = true;

@@ -1,4 +1,5 @@
-var CONNECTOR_FILL_SPEED = 2;
+var CONNECTOR_LINE_WIDTH = 2;
+var CONNECTOR_FILL_SPEED = 5;
 
 function createConnector(fromNode, toNode) {
     var startPos = fromNode.position;
@@ -6,7 +7,7 @@ function createConnector(fromNode, toNode) {
     // Connector:
     var material = new THREE.LineBasicMaterial({
         color: 0xF0C808,
-        linewidth: 10,
+        linewidth: CONNECTOR_LINE_WIDTH
     });
     var geometry = new THREE.Geometry();
     geometry.vertices.push(
@@ -18,20 +19,28 @@ function createConnector(fromNode, toNode) {
     line.userData.filled = false;
 
     line.userData.fill = function(fromNode, toNode) {
+        if (fromNode.position == undefined) return;
         var startPos = fromNode.position.clone();
         var endPos = toNode.position.clone();
         var filler = line.userData.fillers[fromNode.id];
         var dir = endPos.clone().sub(startPos).normalize();
         var totalLength = endPos.distanceTo(startPos);
-        var currentLength = filler.geometry.vertices[0].distanceTo(
-            filler.geometry.vertices[1])
+        // var currentLength = filler.geometry.vertices[0].distanceTo(
+        //     filler.geometry.vertices[1]);
+        var currentLength = _.reduce(line.userData.fillers, function(memo, filler) {
+            return memo + filler.geometry.vertices[0].distanceTo(
+                filler.geometry.vertices[1]);;
+        }, 0);
+        filler.material.color.setHex(
+            fromNode.userData.filler.material.color.getHex());
         if (currentLength < totalLength) {
             filler.geometry.vertices[1].add(
-                dir.multiplyScalar(CONNECTOR_FILL_SPEED))
+                dir.multiplyScalar(CONNECTOR_FILL_SPEED));
             filler.geometry.verticesNeedUpdate = true;
         } else {
             filler.geometry.verticesNeedUpdate = false;
             line.userData.filled = true;
+            line.userData.filledColor = filler.material.color.getHex();
         }
     }
 
@@ -44,7 +53,7 @@ function createConnector(fromNode, toNode) {
     // Connector fill start:
     var fillStartMaterial = new THREE.LineBasicMaterial({
         color: 0x086788,
-        linewidth: 10,
+        linewidth: CONNECTOR_LINE_WIDTH
     });
     var fillStartGeometry = new THREE.Geometry();
     fillStartGeometry.vertices.push(
@@ -63,7 +72,7 @@ function createConnector(fromNode, toNode) {
     // Connector filler end:
     var fillEndMaterial = new THREE.LineBasicMaterial({
         color: 0x086788,
-        linewidth: 10,
+        linewidth: CONNECTOR_LINE_WIDTH
     });
     var fillEndGeometry = new THREE.Geometry();
     fillEndGeometry.vertices.push(
